@@ -16,8 +16,9 @@ struct SeedRange {
 }
 
 const KEYS: [&str; 7] = ["seed", "soil", "fertilizer", "water", "light", "temperature", "humidity"];
+type Legend<'a> = HashMap<&'a str, Vec<SeedMap>>;
 
-fn get_maps<'a>(sections: Split<'a, &'a str>) -> HashMap<&'a str, Vec<SeedMap>> {
+fn get_maps<'a>(sections: Split<'a, &'a str>) -> Legend {
     let mut maps = HashMap::<&str, Vec<SeedMap>>::new();
     for section in sections {
         let mut lines = section.lines();
@@ -67,6 +68,11 @@ fn part_1(file: &str) -> f64 {
     min_location
 }
 
+fn get_min(maps: &Legend, key: &str, range: SeedRange) -> f64 {
+    let mut min_location = f64::INFINITY;
+    min_location
+}
+
 fn range_solution(file: &str) -> f64 {
     let contents = read_to_string(file).expect("Something went wrong reading the file");
     let mut sections = contents.as_str().split("\n\n");
@@ -83,7 +89,10 @@ fn range_solution(file: &str) -> f64 {
         .collect::<Vec<SeedRange>>(); 
     let maps = get_maps(sections);
     let mut min_location = f64::INFINITY;
-    0.0
+    for range in ranges {
+        min_location = min_location.min(get_min(&maps, KEYS[0], range));
+    }
+    min_location
 }
 
 fn main() {
