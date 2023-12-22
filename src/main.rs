@@ -8,6 +8,12 @@ struct SeedMap {
     range_length: usize
 }
 
+#[derive(Debug, Clone, Copy)]
+struct SeedRange {
+    start: usize,
+    end: usize
+}
+
 const KEYS: [&str; 7] = ["seed", "soil", "fertilizer", "water", "light", "temperature", "humidity"];
 
 fn part_1(file: &str) -> f64 {
@@ -54,9 +60,26 @@ fn part_1(file: &str) -> f64 {
     min_location
 }
 
-// fn range_solution(file: &str) -> f64 {
-//     0.0
-// }
+fn range_solution(file: &str) -> f64 {
+    let contents = read_to_string(file).expect("Something went wrong reading the file");
+    let mut sections = contents.as_str().split("\n\n");
+    let mut split = sections.next().unwrap().split_whitespace();
+    // skip first in split
+    split.next();
+    // map through remainder of split in pairs
+    let ranges = split
+        .collect::<Vec<&str>>()
+        .chunks(2)
+        .map(|x| { 
+            let start = x[0].parse::<usize>().unwrap();
+            let end = x[1].parse::<usize>().unwrap();
+            SeedRange { start, end } 
+        })
+        .collect::<Vec<SeedRange>>(); 
+
+
+    0.0
+}
 
 fn main() {
     assert_eq!(part_1("example.txt"), 35 as f64);
