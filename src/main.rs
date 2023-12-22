@@ -68,8 +68,75 @@ fn part_1(file: &str) -> f64 {
     min_location
 }
 
-fn get_min(maps: &Legend, key: &str, range: SeedRange) -> f64 {
+fn get_min(maps: &Legend, key_index: usize, range: SeedRange) -> f64 {
+    if key_index == KEYS.len() {
+        return range.start as f64;
+    }
     let mut min_location = f64::INFINITY;
+    let mut ranges: Vec<SeedRange> = Vec::from(&[range]);
+    let seed_maps = maps.get(KEYS[key_index]).unwrap();
+    while ranges.len() > 0 {
+        let range = ranges.pop().unwrap();
+        for seed_map in seed_maps {
+            let map_start = seed_map.source_range_start;
+            let map_end = map_start + seed_map.range_length;
+            let start_diff = range.start as i64 - map_start as i64;
+            let end_diff = range.end as i64 - map_end as i64;
+            // No overlap
+            if range.end < map_start || range.start > map_end {
+                continue;
+            }
+            // Seed range is entirely within map range
+            if map_start <= range.start && range.end <= map_end {
+                min_location = min_location.min(
+                    get_min(
+                        maps, 
+                        key_index + 1, 
+                        SeedRange {start: seed_map.destination_range_start + start_diff as usize, end: seed_map.destination_range_start + end_diff as usize}
+                    )
+                );
+                break;
+            }
+            // Seed range starts before map range but ends within map range 
+            if range.start < map_end && map_end <= range.end {
+                min_location = min_location.min(
+                    get_min(
+                        maps, 
+                        key_index + 1, 
+                        SeedRange {start: seed_map.destination_range_start, end: seed_map.destination_range_start + end_diff as usize}
+                    )
+                );
+                ranges.push(SeedRange {start: range.start, end: map_start});
+                break;
+            }
+            // Seed range starts within map range but ends after map range 
+            if range.start < map_end && range.end > map_end {
+                min_location = min_location.min(
+                    get_min(
+                        maps, 
+                        key_index + 1, 
+                        SeedRange {start: seed_map.destination_range_start + start_diff as usize, end: seed_map.destination_range_start + seed_map.range_length}
+                    )
+                );
+                ranges.push(SeedRange {start: map_end, end: range.end});
+                break;
+            }
+            // Map range is entirely within seed range
+            if range.start < map_start && map_end < range.end {
+                min_location = min_location.min(
+                    get_min(
+                        maps, 
+                        key_index + 1, 
+                        SeedRange {start: seed_map.destination_range_start + start_diff as usize, end: seed_map.destination_range_start + end_diff as usize}
+                    )
+                );
+                ranges.push(SeedRange {start: map_start, end: range.start});
+                ranges.push(SeedRange {start: map_end, end: range.end});
+                break;
+            }
+            
+        }
+    }
     min_location
 }
 
@@ -83,14 +150,14 @@ fn range_solution(file: &str) -> f64 {
         .chunks(2)
         .map(|x| { 
             let start = x[0].parse::<usize>().unwrap();
-            let end = x[1].parse::<usize>().unwrap();
+            let end = x[1].parse::<usize>().unwrap() + start;
             SeedRange { start, end } 
         })
         .collect::<Vec<SeedRange>>(); 
     let maps = get_maps(sections);
     let mut min_location = f64::INFINITY;
     for range in ranges {
-        min_location = min_location.min(get_min(&maps, KEYS[0], range));
+        min_location = min_location.min(get_min(&maps, 0, range));
     }
     min_location
 }
