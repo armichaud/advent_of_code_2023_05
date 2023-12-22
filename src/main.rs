@@ -84,6 +84,6 @@ fn range_solution(file: &str) -> f64 {
 fn main() {
     assert_eq!(part_1("example.txt"), 35 as f64);
     assert_eq!(part_1("input.txt"), 535088217 as f64);
-    // println!("Part 2: {}", part_2_slow("input.txt"));
-    // println!("Part 2: {}", part_2_build_single_map("input.txt"));
+    assert_eq!(range_solution("example.txt"), 46 as f64);
+    assert_eq!(range_solution("input.txt"), 0 as f64);
 }
