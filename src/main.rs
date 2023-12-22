@@ -1,5 +1,6 @@
 use std::fs::read_to_string;
 use std::collections::HashMap;
+use std::str::Split;
 
 #[derive(Debug, Clone, Copy)]
 struct SeedMap {
@@ -16,18 +17,7 @@ struct SeedRange {
 
 const KEYS: [&str; 7] = ["seed", "soil", "fertilizer", "water", "light", "temperature", "humidity"];
 
-fn part_1(file: &str) -> f64 {
-    let contents = read_to_string(file).expect("Something went wrong reading the file");
-    let mut sections = contents.as_str().split("\n\n");
-    let seeds = sections
-        .next()
-        .unwrap()
-        .split(": ")
-        .nth(1)
-        .unwrap()
-        .split_whitespace()
-        .map(|x| x.parse::<usize>().unwrap())
-        .collect::<Vec<usize>>().clone();
+fn get_maps<'a>(sections: Split<'a, &'a str>) -> HashMap<&'a str, Vec<SeedMap>> {
     let mut maps = HashMap::<&str, Vec<SeedMap>>::new();
     for section in sections {
         let mut lines = section.lines();
@@ -43,6 +33,23 @@ fn part_1(file: &str) -> f64 {
             maps.entry(source_category).or_insert_with(Vec::new).push(seed_map);
         }
     }
+    maps
+}
+
+
+fn part_1(file: &str) -> f64 {
+    let contents = read_to_string(file).expect("Something went wrong reading the file");
+    let mut sections = contents.as_str().split("\n\n");
+    let seeds = sections
+        .next()
+        .unwrap()
+        .split(": ")
+        .nth(1)
+        .unwrap()
+        .split_whitespace()
+        .map(|x| x.parse::<usize>().unwrap())
+        .collect::<Vec<usize>>();
+    let maps = get_maps(sections);
     let mut min_location = f64::INFINITY;
     for seed in seeds {
         let mut n = seed;
@@ -64,9 +71,7 @@ fn range_solution(file: &str) -> f64 {
     let contents = read_to_string(file).expect("Something went wrong reading the file");
     let mut sections = contents.as_str().split("\n\n");
     let mut split = sections.next().unwrap().split_whitespace();
-    // skip first in split
     split.next();
-    // map through remainder of split in pairs
     let ranges = split
         .collect::<Vec<&str>>()
         .chunks(2)
@@ -76,8 +81,8 @@ fn range_solution(file: &str) -> f64 {
             SeedRange { start, end } 
         })
         .collect::<Vec<SeedRange>>(); 
-
-
+    let maps = get_maps(sections);
+    let mut min_location = f64::INFINITY;
     0.0
 }
 
