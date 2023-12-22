@@ -80,8 +80,8 @@ fn get_min(maps: &Legend, key_index: usize, range: SeedRange) -> f64 {
         for seed_map in seed_maps {
             let map_start = seed_map.source_range_start;
             let map_end = map_start + seed_map.range_length;
-            let start_diff = range.start as i64 - map_start as i64;
-            let end_diff = range.end as i64 - map_end as i64;
+            let start_diff = range.start as i128 - map_start as i128;
+            let end_diff = map_end as i128 - range.end as i128;
             // No overlap
             if range.end < map_start || range.start > map_end {
                 continue;
