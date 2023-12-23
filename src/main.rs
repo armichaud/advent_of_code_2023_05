@@ -81,7 +81,7 @@ fn get_min(maps: &Legend, key_index: usize, range: SeedRange) -> f64 {
             let map_start = seed_map.source_range_start;
             let map_end = map_start + seed_map.range_length;
             let start_diff = range.start as i128 - map_start as i128;
-            let end_diff = map_end as i128 - range.end as i128;
+            let end_diff = range.end as i128 - map_start as i128;
             // No overlap
             if range.end < map_start || range.start > map_end {
                 continue;
@@ -165,5 +165,5 @@ fn main() {
     assert_eq!(part_1("example.txt"), 35 as f64);
     assert_eq!(part_1("input.txt"), 535088217 as f64);
     assert_eq!(range_solution("example.txt"), 46 as f64);
-    assert_eq!(range_solution("input.txt"), 0 as f64);
+    assert_eq!(range_solution("input.txt"), 51399228 as f64);
 }
