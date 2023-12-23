@@ -98,7 +98,7 @@ fn get_min(maps: &Legend, key_index: usize, range: SeedRange) -> f64 {
                 break;
             }
             // Seed range starts before map range but ends within map range 
-            if range.start < map_end && map_end <= range.end {
+            if range.start < map_start && map_end <= range.end {
                 min_location = min_location.min(
                     get_min(
                         maps, 
@@ -134,10 +134,9 @@ fn get_min(maps: &Legend, key_index: usize, range: SeedRange) -> f64 {
                 ranges.push(SeedRange {start: map_end, end: range.end});
                 break;
             }
-            
         }
     }
-    min_location
+    if min_location.is_infinite() { get_min(maps, key_index + 1, range) } else { min_location }
 }
 
 fn range_solution(file: &str) -> f64 {
